@@ -13,8 +13,8 @@ class rect():
         dc.SetBrush(wx.Brush("blue", wx.TRANSPARENT))
         dc.SetPen(wx.Pen('black', 1))
         self.draw(dc)
-        dc.SetBrush(wx.Brush("white"))
-        dc.SetPen(wx.Pen('white', 2))
+        dc.SetBrush(wx.Brush("blue"))
+        dc.SetPen(wx.Pen('blue', 2))
         for i in self.pointlist:
             dc.DrawCircle(i[0],i[1],4)
     def IsInpoint(self,p1,p2):
@@ -192,6 +192,13 @@ class rectfont(rect):
         img.paste(img_rect,(int(self.pointlist[0][0]),int(self.pointlist[0][1])))
     def GetOnRectsize(self):
         self.arg['size']=int(self.pos2[1]-self.pos1[1])
+    #矩形的形状根据字体大小改变
+    def GetOnFontsize(self):
+        x1,y1=self.pos1
+        x2,y2=self.pos2
+        y2=y1+self.arg['size']
+        self.reinitby2point(self.pic2win((x1,y1)),self.pic2win((x2,y2)))
+
     def adjust(self,p_curry,mode):
         rect.adjust(self,p_curry,mode);
         self.GetOnRectsize()

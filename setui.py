@@ -20,6 +20,7 @@ class setui(ParaDialog):
         self.rect=rect
         #备份一份数据，若点取消则用此数据
         self.cancel_buf=[rect.pos1,rect.pos2]
+#        self.arg_buf={}
         #读取矩形的坐标信息      
         self.data = {'x':rect.pos1[0], 'y':rect.pos1[1], 'width':rect.pos2[0]-rect.pos1[0],'hight':rect.pos2[1]-rect.pos1[1] ,'preview':False}
 #        self.btn_cancel.Bind( wx.EVT_BUTTON, lambda e:self.commit('cancel'))
@@ -33,6 +34,8 @@ class setui(ParaDialog):
     def on_ok1(self):
         self.handle_(self.para)
     def on_cancel1(self):
+        self.rect.arg=self.arg_buf
+        self.handle_(self.arg_buf)
         self.rect.reinitby2point(self.rect.pic2win(self.cancel_buf[0]),self.rect.pic2win(self.cancel_buf[1]))
         self.rect.parent.UpdateDrawing()
 #图片设置页面
@@ -40,9 +43,14 @@ class PicSetUi(setui):
     def __init__( self, parent,rect, title):
         setui.__init__(self, parent,rect, title)
         self.view+=[(bool, 'Preview', 'preview') ]
+        self.arg_buf=self.data.copy()
         self.init_view(self.view, self.data,modal=False)
         self.pack()
         self.ShowModal()
+    def handle_(self,para):
+        setui.handle_(self,para)
+        self.rect.GetOnRectsize()
+        self.rect.parent.UpdateDrawing()
 class BarSetUi(setui):
     def __init__( self, parent,rect, title):
         setui.__init__(self, parent,rect, title)
@@ -64,12 +72,13 @@ class BarSetUi(setui):
         #         'quiet_zone':6.5,'font_size':10,'text_distance':5.0,'center_text':True}
         data=self.rect.arg 
         self.data.update(data)
+        self.arg_buf=self.data.copy()
         self.init_view(self.view, self.data,modal=False)
         self.pack()
         self.ShowModal()
     def handle_(self,para):
         setui.handle_(self,para)
-        self.rect.arg=self.data
+#        self.rect.arg=self.data
         ean = barcode.get('UPCA', para['text'], writer=ImageWriter())
         self.rect.picpath=para['text']
         filename = ean.save(self.rect.picpath,self.data)
@@ -87,6 +96,7 @@ class fontsetui(setui):
         self.view+=[  
                 ('lab','=========  文字设置  ========='),
                 (str,  '文字', 'text', ''),
+                (int, (0,500), 0, '字体大小', 'size', 'pixel'),
                 (list, fontlist, str, '字体', 'font', ''),
                 ('color','颜色', 'fill', ''),
                 (list, alignlist, str, '排列', 'align', ''),
@@ -95,13 +105,16 @@ class fontsetui(setui):
         data = {'text':self.rect.arg['text'],'font':self.rect.arg['font'],'align':self.rect.arg['align'],
         'fill':self.rect.arg['fill'],'size':self.rect.arg['size']}
         self.data.update(data)
+        self.arg_buf=self.data.copy()
         self.init_view(self.view, self.data,modal=False)
         self.pack()
         self.ShowModal()
     #重写handle函数
     def handle_(self,para):
-        self.rect.arg=self.data 
-        print(para)
+        setui.handle_(self,para)
+        self.rect.arg=para
+        self.rect.GetOnFontsize()
+#        self.rect.GetOnFontsize()
         self.rect.parent.UpdateDrawing()          
 
 #新建的工作区
