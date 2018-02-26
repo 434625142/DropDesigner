@@ -6,11 +6,11 @@ import sys
 from cursor import *
 from popupmenu import *
 USE_BUFFERED_DC = True
-class BufferedWindow(wx.Window):
-    def __init__(self, *args, **kwargs):
+class BufferedWindow(wx.Panel):
+    def __init__(self,parent):
         # make sure the NO_FULL_REPAINT_ON_RESIZE style flag is set.
-        kwargs['style'] = kwargs.setdefault('style', wx.NO_FULL_REPAINT_ON_RESIZE) | wx.NO_FULL_REPAINT_ON_RESIZE
-        wx.Window.__init__(self, *args, **kwargs)
+        # kwargs['style'] = kwargs.setdefault('style', wx.NO_FULL_REPAINT_ON_RESIZE) | wx.NO_FULL_REPAINT_ON_RESIZE
+        wx.Panel.__init__(self, parent)
         wx.EVT_PAINT(self, self.OnPaint)
         wx.EVT_SIZE(self, self.OnSize)
         self.OnSize(None)
@@ -27,19 +27,19 @@ class BufferedWindow(wx.Window):
     def OnSize(self,event):
         Size  = self.ClientSize
         self._Buffer = wx.Bitmap(*Size)
- #       wx.Create
         self.UpdateDrawing()
 
     def SaveToFile(self, FileName, FileType=wx.BITMAP_TYPE_PNG):
         self.img_save.SaveFile(FileName, FileType)
 
     def UpdateDrawing(self,savemode=False):
-        dc = wx.MemoryDC()
-        dc.SelectObject(self._Buffer)
+        # dc = wx.MemoryDC()
+        # dc.SelectObject(self._Buffer)
+        dc=wx.BufferedDC(wx.ClientDC(self), self._Buffer)
         self.Draw(dc,savemode)
-        del dc # need to get rid of the MemoryDC before Update() is called.
-        self.Refresh()
-        self.Update()
+        # del dc # need to get rid of the MemoryDC before Update() is called.
+        # # self.Refresh()
+        # # self.Update()
         
 class DrawWindow(BufferedWindow):
     def __init__(self, *args, **kwargs):

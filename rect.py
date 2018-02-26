@@ -6,17 +6,20 @@ class rect():
     """docstring for ClassName"""
     def __init__(self, parent,pos1,pos2):
         self.parent = parent
+        #这个矩形是否画周围八点和矩形框
+        self.showpoint8mode=True
         self.reinitby2point(pos1,pos2)
     def get_mode(self):return 'None'
     def draw(self,dc):dc.DrawRectangle(self.pos1[0],self.pos1[1],self.pos2[0]-self.pos1[0],self.pos2[1]-self.pos1[1])
     def draw8(self,dc):
-        dc.SetBrush(wx.Brush("blue", wx.TRANSPARENT))
-        dc.SetPen(wx.Pen('black', 1))
-        self.draw(dc)
-        dc.SetBrush(wx.Brush("blue"))
-        dc.SetPen(wx.Pen('blue', 2))
-        for i in self.pointlist:
-            dc.DrawCircle(i[0],i[1],4)
+        if self.showpoint8mode==True:
+            dc.SetBrush(wx.Brush("blue", wx.TRANSPARENT))
+            dc.SetPen(wx.Pen('black', 1))
+            self.draw(dc)
+            dc.SetBrush(wx.Brush("blue"))
+            dc.SetPen(wx.Pen('blue', 2))
+            for i in self.pointlist:
+                dc.DrawCircle(i[0],i[1],4)
     def IsInpoint(self,p1,p2):
     #p1是否在p2点内
         r=4
@@ -24,10 +27,11 @@ class rect():
         else : return False 
     def IsInpoint8(self,p):
     #是否在矩形的八个点周围
-        index=0
-        for i in self.pointlist:
-            if self.IsInpoint(self.win2pic(p),i) : return index
-            index+=1
+        if self.showpoint8mode==True:
+            index=0
+            for i in self.pointlist:
+                if self.IsInpoint(self.win2pic(p),i) : return index
+                index+=1
         return -1   
     #从window窗口的坐标转换为图片上的坐标
     def win2pic(self,pos):return (pos[0]-self.parent.BackImg.pos_x,pos[1]-self.parent.BackImg.pos_y)
@@ -149,6 +153,7 @@ class rectpic(rect):
         self.GetOnRectsize()
     def drawbymode(self,img):
         if self.picpath!='': img.paste(self.img,(int(self.pointlist[0][0]),int(self.pointlist[0][1])))
+        else:self.showpoint8mode=True
 class rectbar(rectpic):
     def __init__(self,parent,pos1,pos2):
         rectpic.__init__(self,parent,pos1,pos2)
@@ -161,7 +166,8 @@ class rectbar(rectpic):
     def GetPicPath(self):
         return self.picpath
     def GetPic(self):
-        return self.img        
+        return self.img  
+    def reinitbyscale(self,size):pass      
 class rectfont(rect):
     """docstring for rectfont"""
     def __init__(self,parent,pos1,pos2):
@@ -176,7 +182,6 @@ class rectfont(rect):
         draw = ImageDraw.Draw(img_rect)
         #获取图片的大小
         W, H =  self.pos2[0]- self.pos1[0], self.pos2[1]- self.pos1[1]
-
         truetype=ImageFont.truetype(self.arg['font'],self.arg['size'])
         #获取画的区域的大小
         w, h = draw.multiline_textsize(text=self.arg['text'],font=truetype)
@@ -190,6 +195,9 @@ class rectfont(rect):
             print('right')
             draw.multiline_text((W-w,0),text=self.arg['text'],font=truetype,fill=self.arg['fill'])                       
         img.paste(img_rect,(int(self.pointlist[0][0]),int(self.pointlist[0][1])))
+        if self.arg['text']=='':
+            self.showpoint8mode=True
+        
     def GetOnRectsize(self):
         self.arg['size']=int(self.pos2[1]-self.pos1[1])
     #矩形的形状根据字体大小改变
@@ -202,5 +210,5 @@ class rectfont(rect):
     def adjust(self,p_curry,mode):
         rect.adjust(self,p_curry,mode);
         self.GetOnRectsize()
-
+    def reinitbyscale(self,size):pass   
         

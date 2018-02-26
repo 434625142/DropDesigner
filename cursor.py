@@ -13,7 +13,7 @@ class cursor():
     def PosDeal(self,pos):
         #如果点超出了图片范围，将点拉回到图像边界
         if pos[0]<self.parent.BackImg.pos_x:pos[0]=self.parent.BackImg.pos_x
-        if pos[1]<self.parent.BackImg.pos_y:pos[1]=self.parent.BackImg.pos_y
+        if pos[1]<self.parent.BackImg.pos_y:pos[1]=self.parent+BackImg.pos_y
         if pos[0]>self.parent.BackImg.pos_x1:pos[0]=self.parent.BackImg.pos_x1
         if pos[1]>self.parent.BackImg.pos_y1:pos[1]=self.parent.BackImg.pos_y1
         return pos      
@@ -67,8 +67,12 @@ class cursor():
                     self.MovePoint=[pos_temp,i.pointlist[0],i.pointlist[2]]
                     self.cursormode='move'
                     self.RecrIndex=j
-                    return 0
+                    print('ok')
+                    i.showpoint8mode=True
+                else:i.showpoint8mode=False
+                    # return 0
                 j+=1
+            self.parent.UpdateDrawing()
     def OnLeftUp(self,event):
         try:
             pos_temp=self.PosDeal(event.GetPosition())
