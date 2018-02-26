@@ -10,7 +10,7 @@ class TestFrame(wx.Frame):
     def __init__(self, parent=None):
         wx.Frame.__init__(self, parent,
                           size = (800,800),
-                          title="Double Buffered Test",
+                          title="DropDesigner",
                           style=wx.DEFAULT_FRAME_STYLE)
         tb = wx.ToolBar( self, -1 ) 
         self.CreateStatusBar()
